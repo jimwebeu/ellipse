@@ -10,7 +10,7 @@ import eu.ellipse.backend.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Service
 public class AuthService {
@@ -39,7 +39,7 @@ public class AuthService {
             throw new InvalidCredentialsException("INVALID_CREDENTIALS");
         }
 
-        user.setLastSeen(LocalDateTime.now());
+        user.setLastSeen(Instant.now());
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getTokenVersion());
@@ -55,7 +55,7 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setName(request.getName());
-        user.setCreatedAt(LocalDateTime.now());
+        user.setCreatedAt(Instant.now());
         user.setIsActive(true);
         user.setTokenVersion(0);
 

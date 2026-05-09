@@ -1,12 +1,15 @@
 package eu.ellipse.backend.service;
 
+import eu.ellipse.backend.dto.CircleMemberWithUserResponse;
 import eu.ellipse.backend.model.Circle;
 import eu.ellipse.backend.model.CircleMember;
 import eu.ellipse.backend.repository.CircleMemberRepository;
 import eu.ellipse.backend.repository.CircleRepository;
+import eu.ellipse.backend.repository.UserRepository;
+import eu.ellipse.backend.model.User;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,11 +18,17 @@ public class CircleService {
 
     private final CircleRepository circleRepository;
     private final CircleMemberRepository circleMemberRepository;
+    private final UserRepository userRepository;
 
-    public CircleService(CircleRepository circleRepository,
-            CircleMemberRepository circleMemberRepository) {
+
+    public CircleService(
+            CircleRepository circleRepository,
+            CircleMemberRepository circleMemberRepository,
+            UserRepository userRepository
+        ) {
         this.circleRepository = circleRepository;
         this.circleMemberRepository = circleMemberRepository;
+        this.userRepository = userRepository;
     }
 
     public Circle createCircle(UUID ownerId, String name, boolean isPrivate) {
@@ -28,14 +37,14 @@ public class CircleService {
         circle.setOwnerId(ownerId);
         circle.setInviteCode(generateInviteCode());
         circle.setIsInviteCodeEnabled(!isPrivate);
-        circle.setCreatedAt(LocalDateTime.now());
+        circle.setCreatedAt(Instant.now());
         circleRepository.save(circle);
 
         CircleMember member = new CircleMember();
         member.setCircleId(circle.getId());
         member.setUserId(ownerId);
         member.setRole("OWNER");
-        member.setJoinedAt(LocalDateTime.now());
+        member.setJoinedAt(Instant.now());
         circleMemberRepository.save(member);
 
         return circle;
@@ -57,18 +66,35 @@ public class CircleService {
         member.setCircleId(circle.getId());
         member.setUserId(userId);
         member.setRole("MEMBER");
-        member.setJoinedAt(LocalDateTime.now());
+        member.setJoinedAt(Instant.now());
         circleMemberRepository.save(member);
 
         return member;
     }
 
-    public List<CircleMember> getCircleMembers(UUID circleId, UUID requestingUserId) {
+    public List<CircleMemberWithUserResponse> getCircleMembers(UUID circleId, UUID requestingUserId) {
         if (!circleMemberRepository.existsByCircleIdAndUserId(circleId, requestingUserId)) {
             throw new RuntimeException("INVALID_PERMISSION");
         }
 
-        return circleMemberRepository.findAllByCircleId(circleId);
+        return circleMemberRepository.findAllByCircleId(circleId)
+                .stream()
+                .map(member -> {
+                    User user = userRepository.findById(member.getUserId())
+                            .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+                    return new CircleMemberWithUserResponse(
+                            member.getId(),
+                            member.getCircleId(),
+                            member.getRole(),
+                            member.getJoinedAt(),
+                            user.getId(),
+                            user.getName(),
+                            user.getEmail(),
+                            user.getAvatarId(),
+                            user.getLastSeen()
+                    );
+                })
+                .toList();
     }
 
     public List<Circle> getUserCircles(UUID userId) {

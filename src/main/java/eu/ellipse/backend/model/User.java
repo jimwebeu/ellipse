@@ -1,7 +1,8 @@
 package eu.ellipse.backend.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -21,12 +22,12 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    private String avatarUrl;
+    private String avatarId;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    private LocalDateTime lastSeen;
+    private Instant lastSeen;
 
     @Column(nullable = false)
     private Boolean isActive = true;
@@ -66,27 +67,27 @@ public class User {
         this.name = name;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
+    public String getAvatarId() {
+        return avatarId;
     }
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
+    public void setAvatarId(String avatarId) {
+        this.avatarId = avatarId;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getLastSeen() {
+    public Instant getLastSeen() {
         return lastSeen;
     }
 
-    public void setLastSeen(LocalDateTime lastSeen) {
+    public void setLastSeen(Instant lastSeen) {
         this.lastSeen = lastSeen;
     }
 

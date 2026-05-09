@@ -1,7 +1,7 @@
 package eu.ellipse.backend.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -22,7 +22,7 @@ public class CircleMember {
     private String role; // "OWNER" or "MEMBER"
 
     @Column(nullable = false)
-    private LocalDateTime joinedAt;
+    private Instant joinedAt;
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -36,6 +36,6 @@ public class CircleMember {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    public LocalDateTime getJoinedAt() { return joinedAt; }
-    public void setJoinedAt(LocalDateTime joinedAt) { this.joinedAt = joinedAt; }
+    public Instant getJoinedAt() { return joinedAt; }
+    public void setJoinedAt(Instant joinedAt) { this.joinedAt = joinedAt; }
 }

@@ -40,7 +40,7 @@ public class CircleController {
         return ResponseEntity.ok(circleService.getUserCircles(userId));
     }
 
-    @PostMapping("/{circleId}/join")
+    @PostMapping("/join")
     public ResponseEntity<?> joinCircle(@RequestHeader("Authorization") String authHeader, @RequestBody JoinCircleRequest request) {
         UUID userId = extractUserId(authHeader);
         return ResponseEntity.ok(circleService.joinCircle(userId, request.getInviteCode()));

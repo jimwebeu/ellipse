@@ -1,6 +1,5 @@
 package eu.ellipse.backend.security;
 
-import eu.ellipse.backend.model.User;
 import eu.ellipse.backend.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,11 +19,13 @@ import java.util.UUID;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final TokenVersionCache tokenVersionCache;
 
-    public JwtAuthFilter(JwtUtil jwtUtil, UserRepository userRepository) {
+    public JwtAuthFilter(JwtUtil jwtUtil,
+                         UserRepository userRepository,
+                         TokenVersionCache tokenVersionCache) {
         this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
+        this.tokenVersionCache = tokenVersionCache;
     }
 
     @Override
@@ -49,15 +50,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         UUID userId = jwtUtil.extractUserId(token);
         Integer tokenVersion = jwtUtil.extractTokenVersion(token);
 
-        User user = userRepository.findById(userId).orElse(null);
-
-        if (user == null || !user.getIsActive() || !user.getTokenVersion().equals(tokenVersion)) {
+        if (!tokenVersionCache.isValid(userId, tokenVersion)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        // tell spring it's authenticated
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null, List.of());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                userId, null, List.of()
+        );
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 

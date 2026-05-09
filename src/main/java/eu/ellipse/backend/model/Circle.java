@@ -1,7 +1,7 @@
 package eu.ellipse.backend.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -25,7 +25,7 @@ public class Circle {
     private Boolean isInviteCodeEnabled = false;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -42,6 +42,6 @@ public class Circle {
     public Boolean getIsInviteCodeEnabled() { return isInviteCodeEnabled; }
     public void setIsInviteCodeEnabled(Boolean isInviteCodeEnabled) { this.isInviteCodeEnabled = isInviteCodeEnabled; }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public Instant getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 }
